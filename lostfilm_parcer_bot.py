@@ -94,7 +94,7 @@ def start_message(message):
         users[str(message.chat.id)] = message.chat.first_name
         save_dict_to_file(users, 'users.txt')
     elif str(message.chat.id) in users.keys():
-        text = '✅ id ' + str(message.chat.id) + ' мы уже знакомы)'
+        text = '✅ ' + ' мы уже знакомы' + str(message.chat.id) + '!'
     bot.send_message(message.chat.id, text)
     print(users)
 
@@ -221,6 +221,50 @@ def search_for_torrents(message):
                 for i in driver.find_elements(By.TAG_NAME, 'a'):
                     if i.text != '':
                         text += i.text + '\n'
+                bot.send_message(message.chat.id, text)
+
+
+def search_for_episodes_in_season(message):
+    bot.send_message(message.chat.id, 'Выполняю запрос...')
+    chrome_options = Options()
+    # chrome_options.add_argument('--headless')
+    chrome_options.add_argument('user-data-dir=' + str(message.chat.id))
+    with webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options) as driver:
+        driver.get(tv_show_url)
+        print(driver.title)
+        if not tv_show_name.lower() in driver.title.lower():
+            bot.send_message(message.chat.id, 'К сожалению сервис не смог обработать ваш запрос, попробуйте '
+                                              'пожалуйста позже')
+            print(driver.title)
+            print('Результаты поиска по запросу \'' + message.text + '\'')
+        else:
+            print(driver.title)
+            driver.find_elements(By.CLASS_NAME, 'item')[6].click()
+            seasons_list = driver.find_elements(By.TAG_NAME, 'h2')
+            for season in seasons_list:
+                if season.text == message.text:
+                    break
+            download_season = driver.find_element(locate_with(By.CLASS_NAME, 'external-btn').below(season))
+            if download_season.get_attribute('class') == 'external-btn inactive':
+                bot.send_message(message.chat.id, 'Извините сезон ещё не завершён, пока этого не произойдёт, скачать '
+                                                  'сезон не получиться. Пытаюсь получить ссылки на вышедшие серии '
+                                                  'неполного сезона...')
+                download_episodes = driver.find_elements(locate_with(By.CLASS_NAME, 'beta').below(season))
+                list_of_episodes = []
+                for episode in download_episodes:
+                    if message.text in episode.text:
+                        list_of_episodes.append(episode)
+                    else:
+                        break
+                text = ''
+                for title in list_of_episodes:
+                    driver.find_element(locate_with(By.CLASS_NAME, 'external-btn').to_right_of(title)).click()
+                    driver.switch_to.window(driver.window_handles[1])
+                    for i in driver.find_elements(By.TAG_NAME, 'a'):
+                        if i.text != '':
+                            text += i.text + '\n'
+                    driver.close()
+                    driver.switch_to.window(driver.window_handles[0])
                 bot.send_message(message.chat.id, text)
 
 
