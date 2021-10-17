@@ -147,8 +147,8 @@ def search_tv_shows(message):
                     markup.add(types.KeyboardButton(name))
                 bot.send_message(message.chat.id, 'Вот что предлагает lostfilm по вашему запросу:', reply_markup=markup)
             else:
-                bot.send_message(message.chat.id, 'К сожалению по вашему запросу мы не нашли не одного сериала, '
-                                                  'но вы можете попробовать уточнить запрос, воспользовавшись '
+                bot.send_message(message.chat.id, 'К сожалению по вашему запросу мы не нашли ни одного сериала, '
+                                                  'но вы можете запустить новый поиск, воспользовавшись '
                                                   'командой /search')
             bot.register_next_step_handler(message, find_seasons)
 
