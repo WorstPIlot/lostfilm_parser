@@ -11,8 +11,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.relative_locator import locate_with
 from credentials import mail, password
+from api_token import token
 
-bot = telebot.TeleBot('941217243:AAEpz16h-utmjtWiZW1sUTWS8lGeTC2NYx4')
+bot = telebot.TeleBot(token)
 temp_dict = {}
 
 
