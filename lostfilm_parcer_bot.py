@@ -211,44 +211,8 @@ def search_for_torrents(message):
             download_season = driver.find_element(locate_with(By.CLASS_NAME, 'external-btn').below(season))
             if download_season.get_attribute('class') == 'external-btn inactive':
                 driver.close()
-                bot.send_message(message.chat.id, 'Извините сезон ещё не завершён, пока этого не произойдёт, скачать '
-                                                  'сезон не получиться.')
-            else:
-                download_season.click()
-                driver.close()
-                driver.switch_to.window(driver.window_handles[0])
-                text = ''
-                for i in driver.find_elements(By.TAG_NAME, 'a'):
-                    if i.text != '':
-                        text += i.text + '\n'
-                bot.send_message(message.chat.id, text)
-
-
-def search_for_episodes_in_season(message):
-    bot.send_message(message.chat.id, 'Выполняю запрос...')
-    chrome_options = Options()
-    # chrome_options.add_argument('--headless')
-    chrome_options.add_argument('user-data-dir=' + str(message.chat.id))
-    with webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options) as driver:
-        driver.get(tv_show_url)
-        print(driver.title)
-        if not tv_show_name.lower() in driver.title.lower():
-            bot.send_message(message.chat.id, 'К сожалению сервис не смог обработать ваш запрос, попробуйте '
-                                              'пожалуйста позже')
-            print(driver.title)
-            print('Результаты поиска по запросу \'' + message.text + '\'')
-        else:
-            print(driver.title)
-            driver.find_elements(By.CLASS_NAME, 'item')[6].click()
-            seasons_list = driver.find_elements(By.TAG_NAME, 'h2')
-            for season in seasons_list:
-                if season.text == message.text:
-                    break
-            download_season = driver.find_element(locate_with(By.CLASS_NAME, 'external-btn').below(season))
-            if download_season.get_attribute('class') == 'external-btn inactive':
-                bot.send_message(message.chat.id, 'Извините сезон ещё не завершён, пока этого не произойдёт, скачать '
-                                                  'сезон не получиться. Пытаюсь получить ссылки на вышедшие серии '
-                                                  'неполного сезона...')
+                bot.send_message(message.chat.id, 'Извините сезон ещё не завершён, скачать. Пытаюсь получить ссылки '
+                                                  'на уже вышедшие серии неполного сезона...')
                 download_episodes = driver.find_elements(locate_with(By.CLASS_NAME, 'beta').below(season))
                 list_of_episodes = []
                 for episode in download_episodes:
@@ -265,6 +229,15 @@ def search_for_episodes_in_season(message):
                             text += i.text + '\n'
                     driver.close()
                     driver.switch_to.window(driver.window_handles[0])
+                bot.send_message(message.chat.id, text)
+            else:
+                download_season.click()
+                driver.close()
+                driver.switch_to.window(driver.window_handles[0])
+                text = ''
+                for i in driver.find_elements(By.TAG_NAME, 'a'):
+                    if i.text != '':
+                        text += i.text + '\n'
                 bot.send_message(message.chat.id, text)
 
 
