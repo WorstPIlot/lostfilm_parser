@@ -162,7 +162,10 @@ def find_seasons(message):
             try:
                 driver.find_elements(By.CLASS_NAME, 'item')[6].click()
                 seasons_list = driver.find_elements(By.TAG_NAME, 'h2')
-                for season in seasons_list[1:]:
+                latest_season = 1
+                if len(driver.find_elements(locate_with(By.CLASS_NAME, 'not-available'))) != 0:
+                    latest_season = 2
+                for season in seasons_list[latest_season:]:
                     markup.add(types.KeyboardButton(season.text))
                 bot.send_message(message.chat.id, 'Какой сезон вы хотите?:', reply_markup=markup)
                 bot.register_next_step_handler(message, search_for_torrents)
