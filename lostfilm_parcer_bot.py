@@ -81,11 +81,11 @@ if len(temp_dict) > 0:
 def start_message(message):
     text = ''
     if str(message.chat.id) not in users.keys():
-        text = ('✅ ' + str(message.chat.id) + ' добавлен в список пользователей!')
+        text = ('Добро пожаловать ' + message.chat.first_name + '!')
         users[str(message.chat.id)] = message.chat.first_name
         save_dict_to_file(users, 'users.txt')
     elif str(message.chat.id) in users.keys():
-        text = '✅ ' + ' мы уже знакомы' + str(message.chat.id) + '!'
+        text = 'Я вас помню ' + message.chat.first_name + ', нет нужды отправлять start дважды)'
     bot.send_message(message.chat.id, text)
     print(users)
 
@@ -104,12 +104,12 @@ def start_message(message):
 
 def search_tv_shows(message):
     bot.send_message(message.chat.id, 'Выполняю запрос...')
+    print(time_date_now(), message.chat.id, ' searched for ', message.text)
     chrome_options = Options()
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('user-data-dir=' + str(message.chat.id))
     with webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options) as driver:
         driver.get(url)
-        print(driver.title)
         links_on_start_page = driver.find_elements(By.CLASS_NAME, "link")
         if links_on_start_page[4].text == 'Вход':
             links_on_start_page[4].click()
@@ -123,8 +123,6 @@ def search_tv_shows(message):
         search_box.submit()
         if driver.title != 'Результаты поиска по запросу \'' + message.text.lower() + '\'':
             error_apologies(message)
-            print(driver.title)
-            print('Результаты поискаHow to hide ReplyKeyboardMarkup по запросу \'' + message.text + '\'')
         else:
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
             result_list = []
@@ -144,25 +142,21 @@ def search_tv_shows(message):
 
 def find_seasons(message):
     bot.send_message(message.chat.id, 'Выполняю запрос...')
+    print(time_date_now(), message.chat.id, ' request: ', message.text)
     chrome_options = Options()
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('user-data-dir=' + str(message.chat.id))
     with webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options) as driver:
         driver.get(url)
-        print(driver.title)
         search_box = driver.find_element(By.NAME, 'q')
         search_box.clear()
         search_box.send_keys(message.text)
         search_box.submit()
         if driver.title != 'Результаты поиска по запросу \'' + message.text.lower() + '\'':
             error_apologies(message)
-            print(driver.title)
-            print('Результаты поиска по запросу \'' + message.text + '\'')
         else:
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-            print(driver.title)
             driver.find_element(By.CLASS_NAME, 'name-ru').click()
-            print(driver.title)
             global tv_show_url
             tv_show_url = driver.current_url
             try:
@@ -180,18 +174,15 @@ def find_seasons(message):
 
 def search_for_torrents(message):
     bot.send_message(message.chat.id, 'Выполняю запрос...')
+    print(time_date_now(), message.chat.id, ' request: ', message.text)
     chrome_options = Options()
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('user-data-dir=' + str(message.chat.id))
     with webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options) as driver:
         driver.get(tv_show_url)
-        print(driver.title)
         if not tv_show_name.lower() in driver.title.lower():
             error_apologies(message)
-            print(driver.title)
-            print('Результаты поиска по запросу \'' + message.text + '\'')
         else:
-            print(driver.title)
             driver.find_elements(By.CLASS_NAME, 'item')[6].click()
             seasons_list = driver.find_elements(By.TAG_NAME, 'h2')
             for season in seasons_list:
