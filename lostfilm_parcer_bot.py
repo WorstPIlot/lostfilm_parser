@@ -210,26 +210,29 @@ def search_for_torrents(message):
                     break
             download_season = driver.find_element(locate_with(By.CLASS_NAME, 'external-btn').below(season))
             if download_season.get_attribute('class') == 'external-btn inactive':
-                driver.close()
                 bot.send_message(message.chat.id, 'Извините сезон ещё не завершён, скачать. Пытаюсь получить ссылки '
                                                   'на уже вышедшие серии неполного сезона...')
                 download_episodes = driver.find_elements(locate_with(By.CLASS_NAME, 'beta').below(season))
                 list_of_episodes = []
                 for episode in download_episodes:
                     if message.text in episode.text:
-                        list_of_episodes.append(episode)
+                        download_episode = driver.find_element(locate_with(By.CLASS_NAME, 'external-btn').to_right_of(episode))
+                        if download_episode.get_attribute('class') != 'external-btn inactive':
+                            list_of_episodes.append(episode)
                     else:
                         break
                 text = ''
                 for title in list_of_episodes:
-                    driver.find_element(locate_with(By.CLASS_NAME, 'external-btn').to_right_of(title)).click()
+                    download_episode = driver.find_element(locate_with(By.CLASS_NAME, 'external-btn').to_right_of(title))
+                    download_episode.click()
                     driver.switch_to.window(driver.window_handles[1])
+                    text = ''
                     for i in driver.find_elements(By.TAG_NAME, 'a'):
                         if i.text != '':
                             text += i.text + '\n'
                     driver.close()
                     driver.switch_to.window(driver.window_handles[0])
-                bot.send_message(message.chat.id, text)
+                    bot.send_message(message.chat.id, text)
             else:
                 download_season.click()
                 driver.close()
