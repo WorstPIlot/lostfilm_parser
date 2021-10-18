@@ -10,6 +10,9 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.relative_locator import locate_with
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import random
 from credentials import mail, password
 from api_token import token
 
@@ -203,15 +206,19 @@ def search_for_torrents(message):
                 list_of_episodes = []
                 for episode in download_episodes:
                     if message.text in episode.text:
-                        download_episode = driver.find_element(locate_with(By.CLASS_NAME, 'external-btn').to_right_of(episode))
+                        download_episode = driver.find_element(locate_with(By.CLASS_NAME, 'external-btn').to_right_of(
+                            episode))
                         if download_episode.get_attribute('class') != 'external-btn inactive':
                             list_of_episodes.append(episode)
                     else:
                         break
                 for title in list_of_episodes:
-                    download_episode = driver.find_element(locate_with(By.CLASS_NAME, 'external-btn').to_right_of(title))
+                    download_episode = driver.find_element(locate_with(By.CLASS_NAME, 'external-btn').to_right_of(
+                        title))
                     download_episode.click()
                     driver.switch_to.window(driver.window_handles[1])
+                    WebDriverWait(driver, random.randint(10, 30)).until(EC.presence_of_element_located((By.TAG_NAME, 'a'
+                                                                                                        )))
                     text = ''
                     for i in driver.find_elements(By.TAG_NAME, 'a'):
                         if i.text != '':
