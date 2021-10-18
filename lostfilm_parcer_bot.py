@@ -163,8 +163,14 @@ def find_seasons(message):
                 driver.find_elements(By.CLASS_NAME, 'item')[6].click()
                 seasons_list = driver.find_elements(By.TAG_NAME, 'h2')
                 latest_season = 1
-                if len(driver.find_elements(locate_with(By.CLASS_NAME, 'not-available'))) != 0:
-                    latest_season = 2
+                count_of_unavailable_episodes = driver.find_elements(locate_with(By.CLASS_NAME, 'not-available'))
+                if len(count_of_unavailable_episodes) != 0:
+                    child = count_of_unavailable_episodes.find_elements(By.XPATH, ".//*")
+                    if child[3] == message.text + ' 1 серия':
+                        latest_season = 2
+                if seasons_list[latest_season:] == 0:
+                    bot.send_message(message.chat.id, 'Мы не смогли найти у сериала ни одного сезона. Может быть '
+                                                      'сериал ещё только-только анонсирован?')
                 for season in seasons_list[latest_season:]:
                     markup.add(types.KeyboardButton(season.text))
                 bot.send_message(message.chat.id, 'Какой сезон вы хотите?:', reply_markup=markup)
