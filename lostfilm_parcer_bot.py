@@ -53,14 +53,8 @@ def save_dict_to_file(dict_name, filename):
     temp_dict.clear()
 
 
-def you_are_not_admin(chat_id):
-    text = '❌ В доступе отказано id ' + str(chat_id) + ' нет в списке администраторов!'
-    return text
-
-
-def del_user_from_dict(user_key):
-    del users[str(user_key)]
-    save_dict_to_file(users, 'users.txt')
+def error_apologies(message):
+    bot.send_message(message.chat.id, 'Похоже сайт ответил не так как мы ожидали, или упал. Попробуйте ещё раз позже.')
 
 
 def time_date_now():
@@ -83,13 +77,6 @@ if len(temp_dict) > 0:
 def start_message(message):
     text = ''
     if str(message.chat.id) not in users.keys():
-        text = '''Нажимая кнопку "Согласен" вы подтверждаете, что
-        1)Обязуетесь не посылать много запросов в короткий промежуток времени
-        2)Не собираетесь использовать сервис во вред для администратора сервиса
-        3)Понимаете что в случае если вы будете уличены в нарушении первых двух пунктов, можете быть забанены, и ваши
-        запросы перестанут обрабатываться, временно или насовсем
-        4)Разрешаете сервису, записать и хранить ваш id и Имя в telegram, в течении неограниченного времени.
-        Нажав кнопку "Не Согласен" вы не получите доступа к сервису.'''
         text = ('✅ ' + str(message.chat.id) + ' добавлен в список пользователей!')
         users[str(message.chat.id)] = message.chat.first_name
         save_dict_to_file(users, 'users.txt')
@@ -132,8 +119,7 @@ def search_tv_shows(message):
         search_box.send_keys(message.text)
         search_box.submit()
         if driver.title != 'Результаты поиска по запросу \'' + message.text.lower() + '\'':
-            bot.send_message(message.chat.id, 'К сожалению сервис не смог обработать ваш запрос, попробуйте '
-                                              'пожалуйста позже')
+            error_apologies(message)
             print(driver.title)
             print('Результаты поискаHow to hide ReplyKeyboardMarkup по запросу \'' + message.text + '\'')
         else:
@@ -167,8 +153,7 @@ def find_seasons(message):
         search_box.send_keys(message.text)
         search_box.submit()
         if driver.title != 'Результаты поиска по запросу \'' + message.text.lower() + '\'':
-            bot.send_message(message.chat.id, 'К сожалению сервис не смог обработать ваш запрос, попробуйте '
-                                              'пожалуйста позже')
+            error_apologies(message)
             print(driver.title)
             print('Результаты поиска по запросу \'' + message.text + '\'')
         else:
@@ -178,14 +163,17 @@ def find_seasons(message):
             print(driver.title)
             global tv_show_url
             tv_show_url = driver.current_url
-            driver.find_elements(By.CLASS_NAME, 'item')[6].click()
-            seasons_list = driver.find_elements(By.TAG_NAME, 'h2')
-            for season in seasons_list[1:]:
-                markup.add(types.KeyboardButton(season.text))
-            bot.send_message(message.chat.id, 'Какой сезон вы хотите?:', reply_markup=markup)
-            bot.register_next_step_handler(message, search_for_torrents)
-            global tv_show_name
-            tv_show_name = driver.find_element(By.CLASS_NAME, 'title-ru').text
+            try:
+                driver.find_elements(By.CLASS_NAME, 'item')[6].click()
+                seasons_list = driver.find_elements(By.TAG_NAME, 'h2')
+                for season in seasons_list[1:]:
+                    markup.add(types.KeyboardButton(season.text))
+                bot.send_message(message.chat.id, 'Какой сезон вы хотите?:', reply_markup=markup)
+                bot.register_next_step_handler(message, search_for_torrents)
+                global tv_show_name
+                tv_show_name = driver.find_element(By.CLASS_NAME, 'title-ru').text
+            except IndexError:
+                error_apologies(message)
 
 
 def search_for_torrents(message):
@@ -197,8 +185,7 @@ def search_for_torrents(message):
         driver.get(tv_show_url)
         print(driver.title)
         if not tv_show_name.lower() in driver.title.lower():
-            bot.send_message(message.chat.id, 'К сожалению сервис не смог обработать ваш запрос, попробуйте '
-                                              'пожалуйста позже')
+            error_apologies(message)
             print(driver.title)
             print('Результаты поиска по запросу \'' + message.text + '\'')
         else:
@@ -210,7 +197,7 @@ def search_for_torrents(message):
                     break
             download_season = driver.find_element(locate_with(By.CLASS_NAME, 'external-btn').below(season))
             if download_season.get_attribute('class') == 'external-btn inactive':
-                bot.send_message(message.chat.id, 'Извините сезон ещё не завершён, скачать. Пытаюсь получить ссылки '
+                bot.send_message(message.chat.id, 'Сезон ещё не завершён. Пытаюсь получить ссылки '
                                                   'на уже вышедшие серии неполного сезона...')
                 download_episodes = driver.find_elements(locate_with(By.CLASS_NAME, 'beta').below(season))
                 list_of_episodes = []
@@ -221,7 +208,6 @@ def search_for_torrents(message):
                             list_of_episodes.append(episode)
                     else:
                         break
-                text = ''
                 for title in list_of_episodes:
                     download_episode = driver.find_element(locate_with(By.CLASS_NAME, 'external-btn').to_right_of(title))
                     download_episode.click()
