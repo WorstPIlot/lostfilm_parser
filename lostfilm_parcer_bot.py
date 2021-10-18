@@ -165,7 +165,7 @@ def find_seasons(message):
                 latest_season = 1
                 count_of_unavailable_episodes = driver.find_elements(locate_with(By.CLASS_NAME, 'not-available'))
                 if len(count_of_unavailable_episodes) != 0:
-                    child = count_of_unavailable_episodes.find_elements(By.XPATH, ".//*")
+                    child = count_of_unavailable_episodes[0].find_elements(By.XPATH, ".//*")
                     if child[3] == message.text + ' 1 серия':
                         latest_season = 2
                 if seasons_list[latest_season:] == 0:
