@@ -17,6 +17,7 @@ from credentials import mail, password
 from api_token import token
 
 bot = telebot.TeleBot(token)
+url = 'https://www.lostfilm.tv'
 temp_dict = {}
 
 
@@ -104,10 +105,9 @@ def start_message(message):
 def search_tv_shows(message):
     bot.send_message(message.chat.id, 'Выполняю запрос...')
     chrome_options = Options()
-    # chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--headless')
     chrome_options.add_argument('user-data-dir=' + str(message.chat.id))
     with webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options) as driver:
-        url = 'https://www.lostfilm.tv'
         driver.get(url)
         print(driver.title)
         links_on_start_page = driver.find_elements(By.CLASS_NAME, "link")
@@ -145,10 +145,9 @@ def search_tv_shows(message):
 def find_seasons(message):
     bot.send_message(message.chat.id, 'Выполняю запрос...')
     chrome_options = Options()
-    # chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--headless')
     chrome_options.add_argument('user-data-dir=' + str(message.chat.id))
     with webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options) as driver:
-        url = 'https://www.lostfilm.tv'
         driver.get(url)
         print(driver.title)
         search_box = driver.find_element(By.NAME, 'q')
@@ -182,7 +181,7 @@ def find_seasons(message):
 def search_for_torrents(message):
     bot.send_message(message.chat.id, 'Выполняю запрос...')
     chrome_options = Options()
-    # chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--headless')
     chrome_options.add_argument('user-data-dir=' + str(message.chat.id))
     with webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options) as driver:
         driver.get(tv_show_url)
