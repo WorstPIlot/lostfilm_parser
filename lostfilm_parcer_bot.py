@@ -209,13 +209,21 @@ def search_for_torrents(message):
                     driver.switch_to.window(driver.window_handles[1])
                     WebDriverWait(driver, random.randint(10, 30)).until(EC.presence_of_element_located((By.TAG_NAME, 'a'
                                                                                                         )))
-                    text = ''
+                    text = []
                     for i in driver.find_elements(By.TAG_NAME, 'a'):
                         if i.text != '':
-                            text += i.text + '\n'
+                            text.append(i.text)
+                    description = []
+                    for i in driver.find_elements(By.CLASS_NAME, 'inner-box--desc'):
+                        description.append(i.text)
+                    position = 0
+                    for i in range(2, len(text) + len(description), 3):
+                        text.insert(i, description[position])
+                        if not position + 1 > len(description):
+                            position += 1
                     driver.close()
                     driver.switch_to.window(driver.window_handles[0])
-                    bot.send_message(message.chat.id, text)
+                    bot.send_message(message.chat.id, '\n'.join(text))
             else:
                 download_season.click()
                 driver.close()
