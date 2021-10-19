@@ -255,4 +255,9 @@ def search_for_torrents(message):
                 bot.send_message(message.chat.id, '\n'.join(text))
 
 
+@bot.message_handler(func=lambda message: True)
+def echo_message(message):
+    bot.send_message(message.chat.id, 'Пожалуйста отправьте сначала /search')
+
+
 bot.polling()
