@@ -95,7 +95,7 @@ def start_message(message):
 def start_message(message):
     bot.send_message(message.chat.id, '''/search для поискового запроса
     /help для вывода этой справки''')
-    
+
 
 @bot.message_handler(commands=['search'])
 def start_message(message):
@@ -103,21 +103,30 @@ def start_message(message):
     bot.register_next_step_handler(message, search_tv_shows)
 
 
+def log_in_if_not(driver):
+    links_on_start_page = driver.find_elements(By.CLASS_NAME, "link")
+    if links_on_start_page[4].text == 'Вход':
+        links_on_start_page[4].click()
+        driver.find_element(By.NAME, 'mail').send_keys(mail)
+        driver.find_element(By.NAME, 'pass').send_keys(password)
+        driver.find_element(By.CLASS_NAME, 'primary-btn').click()
+
+
+def spawn_browser(message):
+    url = 'https://www.lostfilm.tv'
+    chrome_options = Options()
+    # chrome_options.add_argument('--headless')
+    chrome_options.add_argument('user-data-dir=' + str(message.chat.id))
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
+    driver.get(url)
+    log_in_if_not(driver)
+    return driver
+
+
 def search_tv_shows(message):
     bot.send_message(message.chat.id, 'Выполняю запрос...')
     print(time_date_now(), message.chat.id, ' searched for ', message.text)
-    chrome_options = Options()
-    chrome_options.add_argument('--headless')
-    chrome_options.add_argument('user-data-dir=' + str(message.chat.id))
-    with webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options) as driver:
-        driver.get(url)
-        links_on_start_page = driver.find_elements(By.CLASS_NAME, "link")
-        if links_on_start_page[4].text == 'Вход':
-            links_on_start_page[4].click()
-            driver.find_element(By.NAME, 'mail').send_keys(mail)
-            driver.find_element(By.NAME, 'pass').send_keys(password)
-            driver.find_element(By.CLASS_NAME, 'primary-btn').click()
-        driver.get(url)
+    with spawn_browser(message) as driver:
         search_box = driver.find_element(By.NAME, 'q')
         search_box.clear()
         search_box.send_keys(message.text)
