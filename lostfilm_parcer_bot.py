@@ -144,7 +144,7 @@ def find_seasons(message):
     bot.send_message(message.chat.id, 'Выполняю запрос...')
     print(time_date_now(), message.chat.id, ' request: ', message.text)
     chrome_options = Options()
-    #chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--headless')
     chrome_options.add_argument('user-data-dir=' + str(message.chat.id))
     with webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options) as driver:
         driver.get(url)
@@ -186,7 +186,7 @@ def search_for_torrents(message):
     bot.send_message(message.chat.id, 'Выполняю запрос...')
     print(time_date_now(), message.chat.id, ' request: ', message.text)
     chrome_options = Options()
-    #chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--headless')
     chrome_options.add_argument('user-data-dir=' + str(message.chat.id))
     with webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options) as driver:
         driver.get(tv_show_url)
