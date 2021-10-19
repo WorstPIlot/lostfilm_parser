@@ -81,7 +81,8 @@ if len(temp_dict) > 0:
 def start_message(message):
     text = ''
     if str(message.chat.id) not in users.keys():
-        text = ('Добро пожаловать ' + message.chat.first_name + '!')
+        text = ('Добро пожаловать ' + message.chat.first_name + '! Для поиска по сериалам на сайте lostfilm, '
+                                                                'воспользуйтесь командой /search')
         users[str(message.chat.id)] = message.chat.first_name
         save_dict_to_file(users, 'users.txt')
     elif str(message.chat.id) in users.keys():
