@@ -144,7 +144,7 @@ def find_seasons(message):
     bot.send_message(message.chat.id, 'Выполняю запрос...')
     print(time_date_now(), message.chat.id, ' request: ', message.text)
     chrome_options = Options()
-    chrome_options.add_argument('--headless')
+    #chrome_options.add_argument('--headless')
     chrome_options.add_argument('user-data-dir=' + str(message.chat.id))
     with webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options) as driver:
         driver.get(url)
@@ -163,10 +163,11 @@ def find_seasons(message):
                 driver.find_elements(By.CLASS_NAME, 'item')[6].click()
                 seasons_list = driver.find_elements(By.TAG_NAME, 'h2')
                 latest_season = 1
+                latest_season_name = seasons_list[latest_season]
                 count_of_unavailable_episodes = driver.find_elements(locate_with(By.CLASS_NAME, 'not-available'))
                 if len(count_of_unavailable_episodes) != 0:
                     child = count_of_unavailable_episodes[0].find_elements(By.XPATH, ".//*")
-                    if child[3].text == message.text + ' 1 серия':
+                    if child[3].text == latest_season_name.text + ' 1 серия':
                         latest_season = 2
                 if seasons_list[latest_season:] == 0:
                     bot.send_message(message.chat.id, 'Мы не смогли найти у сериала ни одного сезона. Может быть '
@@ -185,7 +186,7 @@ def search_for_torrents(message):
     bot.send_message(message.chat.id, 'Выполняю запрос...')
     print(time_date_now(), message.chat.id, ' request: ', message.text)
     chrome_options = Options()
-    chrome_options.add_argument('--headless')
+    #chrome_options.add_argument('--headless')
     chrome_options.add_argument('user-data-dir=' + str(message.chat.id))
     with webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options) as driver:
         driver.get(tv_show_url)
@@ -237,11 +238,19 @@ def search_for_torrents(message):
                 download_season.click()
                 driver.close()
                 driver.switch_to.window(driver.window_handles[0])
-                text = ''
+                text = []
                 for i in driver.find_elements(By.TAG_NAME, 'a'):
                     if i.text != '':
-                        text += i.text + '\n'
-                bot.send_message(message.chat.id, text)
+                        text.append(i.text)
+                description = []
+                for i in driver.find_elements(By.CLASS_NAME, 'inner-box--desc'):
+                    description.append(i.text)
+                position = 0
+                for i in range(2, len(text) + len(description), 3):
+                    text.insert(i, description[position])
+                    if not position + 1 > len(description):
+                        position += 1
+                bot.send_message(message.chat.id, '\n'.join(text))
 
 
 bot.polling()
