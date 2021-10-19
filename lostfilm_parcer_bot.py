@@ -238,6 +238,8 @@ def search_for_torrents(message):
                 download_season.click()
                 driver.close()
                 driver.switch_to.window(driver.window_handles[0])
+                WebDriverWait(driver, random.randint(10, 30)).until(EC.presence_of_element_located((By.TAG_NAME, 'a'
+                                                                                                    )))
                 text = []
                 for i in driver.find_elements(By.TAG_NAME, 'a'):
                     if i.text != '':
