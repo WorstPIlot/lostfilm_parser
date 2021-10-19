@@ -166,7 +166,7 @@ def find_seasons(message):
                 count_of_unavailable_episodes = driver.find_elements(locate_with(By.CLASS_NAME, 'not-available'))
                 if len(count_of_unavailable_episodes) != 0:
                     child = count_of_unavailable_episodes[0].find_elements(By.XPATH, ".//*")
-                    if child[3] == message.text + ' 1 серия':
+                    if child[3].text == message.text + ' 1 серия':
                         latest_season = 2
                 if seasons_list[latest_season:] == 0:
                     bot.send_message(message.chat.id, 'Мы не смогли найти у сериала ни одного сезона. Может быть '
