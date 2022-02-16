@@ -16,13 +16,6 @@ import random
 from credentials import mail, password
 from api_token import token
 
-pidfile = 'lostfilm_parcer_bot.py.pidfile'
-with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), pidfile), 'w') as f:
-    f.write(str(os.getpid()))
-
-bot = telebot.TeleBot(token)
-temp_dict = {}
-
 
 def exists(filename):
     # Проверяем существет ли файл
@@ -30,6 +23,37 @@ def exists(filename):
         return True
     else:
         return False
+
+
+def first_init():
+    filenames = ['credentials.py', 'api_token.py']
+    for filename in filenames:
+        if not exists(filename):
+            with open(filename, 'w', encoding='utf-8') as file:
+                if filename == 'credentials.py':
+                    file.write("mail = ''")
+                    file.write("password = ''")
+                    print(filename, 'создан! Заполните его вашим логином и паролем, с сайта lostfilm.tv!')
+                elif filename == 'api_token.py':
+                    file.write("token = ''")
+                    print(filename, 'создан! Заполните его вашим API token бота telegram!')
+
+
+filename = 'credentials.py'
+if mail == '':
+    print('Нужно указать ваш email в файле', filename)
+    exit(1)
+if password == '':
+    print('Нужно указать ваш пароль в файле', filename)
+    exit(1)
+filename = 'api_token.py'
+if exists(filename):
+    if token == '':
+        print('Нужно указать ваш telegram API bot token в', filename)
+        exit(1)
+
+bot = telebot.TeleBot(token)
+temp_dict = {}
 
 
 def write_file_from_dict(dict_name, filename):
@@ -71,11 +95,6 @@ def time_date_now():
 read_saved_dict('users.txt')
 users = temp_dict.copy()
 print(users)
-if len(temp_dict) > 0:
-    temp_dict.clear()
-read_saved_dict('admins.txt')
-admins = temp_dict.copy()
-print(admins)
 if len(temp_dict) > 0:
     temp_dict.clear()
 
