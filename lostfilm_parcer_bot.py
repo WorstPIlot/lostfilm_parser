@@ -13,16 +13,17 @@ from selenium.webdriver.support.relative_locator import locate_with
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import random
+import json
 from credentials import mail, password
 from api_token import token
 
-pidfile = 'urf.im_notifications.py.pidfile'
+pidfile = 'lostfilm_parcer_bot.py.pidfile'
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), pidfile), 'w') as f:
     f.write(str(os.getpid()))
 
 
 def exists(filename):
-    # Проверяем существет ли файл
+    # Проверяем существует ли файл
     if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)):
         return True
     else:
@@ -62,20 +63,14 @@ temp_dict = {}
 
 def write_file_from_dict(dict_name, filename):
     with open(filename, 'w', encoding='utf-8') as file:
-        for item in dict_name.items():
-            file.write(str(item) + '\n')
+        file.write(json.dumps(dict_name))
 
 
 def read_saved_dict(filename):
     if exists(filename):
         with open(filename, 'r', encoding='utf-8') as file:
-            for line in file:
-                symbol = ['(', ')', '\'', '\n']
-                for i in symbol:
-                    line = line.replace(i, '')
-                userid = line.split(',')[0]
-                firstname = line.split(',')[1]
-                temp_dict[userid] = firstname
+            for key, value in json.loads(file.read()).items():
+                temp_dict[key] = value
         return True
     else:
         return False
