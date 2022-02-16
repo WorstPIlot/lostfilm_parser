@@ -1,6 +1,7 @@
 # WARNING Linux oriented project, it might work on Windows environment, but you are on your own to solve problems, if any problems will occur.
 ## Consider creating venv for this project (optional)
 ## INSTALLATION:
+python3.6, python-pip should be installed
 0) cd into project dir
 1) create virtual environment (optional step)
 ```
