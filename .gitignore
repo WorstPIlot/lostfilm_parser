@@ -1,0 +1,7 @@
+.idea
+venv
+api_token.py
+credentials.py
+users.txt
+admins.txt
+/lostfilm_parcer_bot.py.pidfile
