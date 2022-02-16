@@ -16,6 +16,10 @@ import random
 from credentials import mail, password
 from api_token import token
 
+pidfile = 'urf.im_notifications.py.pidfile'
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), pidfile), 'w') as f:
+    f.write(str(os.getpid()))
+
 
 def exists(filename):
     # Проверяем существет ли файл
