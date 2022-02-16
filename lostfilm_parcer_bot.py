@@ -63,13 +63,13 @@ temp_dict = {}
 
 def write_file_from_dict(dict_name, filename):
     with open(filename, 'w', encoding='utf-8') as file:
-        file.write(json.dumps(dict_name))
+        file.write(json.dumps(dict_name, ensure_ascii=False))
 
 
 def read_saved_dict(filename):
     if exists(filename):
         with open(filename, 'r', encoding='utf-8') as file:
-            for key, value in json.loads(file.read()).items():
+            for key, value in json.loads(file.read(), ensure_ascii=False).items():
                 temp_dict[key] = value
         return True
     else:
