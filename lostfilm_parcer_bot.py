@@ -69,7 +69,7 @@ def write_file_from_dict(dict_name, filename):
 def read_saved_dict(filename):
     if exists(filename):
         with open(filename, 'r', encoding='utf-8') as file:
-            for key, value in json.loads(file.read(), ensure_ascii=False).items():
+            for key, value in json.loads(file.read()).items():
                 temp_dict[key] = value
         return True
     else:
