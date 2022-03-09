@@ -128,12 +128,16 @@ def search_for_tv_show(message, driver):
     search_box = driver.find_element(By.NAME, 'q')
     search_box.clear()
     search_box.send_keys(message.text)
+    search_box.send_keys(' ')
+    search_box.send_keys('\b')
     search_box.submit()
     if driver.title != 'Результаты поиска по запросу \'' + message.text.lower() + '\'':
         error_apologies(message)
 
 
 def log_in_if_not(driver):
+    WebDriverWait(driver, random.randint(60, 300)).until(EC.presence_of_element_located((By.CLASS_NAME, 'link'
+                                                                                        )))
     links_on_start_page = driver.find_elements(By.CLASS_NAME, "link")
     if links_on_start_page[4].text == 'Вход':
         links_on_start_page[4].click()
@@ -143,9 +147,9 @@ def log_in_if_not(driver):
 
 
 def spawn_browser(message):
-    url = 'https://www.lostfilm.tv'
+    url = 'https://www.lostfilmtv5.site'
     chrome_options = Options()
-    chrome_options.add_argument('--headless')
+    # chrome_options.add_argument('--headless')
     chrome_options.add_argument('user-data-dir=' + str(message.chat.id))
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
     driver.get(url)
